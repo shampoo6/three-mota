@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+</body>
+<script type="module" src="js/three/build/three.module.js"></script>
+<script type="module" src="js/three/examples/jsm/controls/OrbitControls.js"></script>
+<script type="module">
+    import * as THREE from './js/three/build/three.module.js'
+    import {OrbitControls} from './js/three/examples/jsm/controls/OrbitControls.js'
+
+    // 初始场景
+    const scene = new THREE.Scene()
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+
+    const renderer = new THREE.WebGLRenderer()
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    document.body.appendChild(renderer.domElement)
+
+    // controls
+
+    const controls = new OrbitControls(camera, renderer.domElement)
+
+    //controls.addEventListener( 'change', render ); // call this only in static scenes (i.e., if there is no animation loop)
+
+    controls.enableDamping = true // an animation loop is required when either damping or auto-rotation are enabled
+    controls.dampingFactor = 0.05
+
+    controls.screenSpacePanning = false
+
+    controls.minDistance = 5
+    controls.maxDistance = 20
+
+    controls.maxPolarAngle = Math.PI / 2
+
+    // 添加对象
+    const geometry = new THREE.BoxGeometry()
+    const material = new THREE.MeshBasicMaterial({color: 0x00ff00})
+    const cube = new THREE.Mesh(geometry, material)
+    scene.add(cube)
+
+    // 调整相机
+    camera.position.z = 5
+
+    function animate() {
+        requestAnimationFrame(animate)
+        renderer.render(scene, camera)
+    }
+
+    animate()
+</script>
+</html>
