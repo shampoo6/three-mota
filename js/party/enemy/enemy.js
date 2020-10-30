@@ -1,4 +1,4 @@
-import Party from './party.js'
+import Party from '../party.js'
 
 class Enemy extends Party {
     constructor(x, y, name, img) {

@@ -1,9 +1,10 @@
 import BlockType from './blockType.js'
 import Player from './party/player.js'
 import Road from './env/road.js'
-import Enemy from './party/enemy.js'
+import Enemy from './party/enemy/enemy.js'
 import Item from './item/item.js'
 import audioPlayer from './audioPlayer.js'
+import scene from './core/scene.js'
 
 const mapSize = {
     width: 9,
@@ -128,6 +129,7 @@ class GameController {
             if (attach) {
                 if (attach instanceof Enemy) {
                     // todo 触发战斗
+                    this.battle(attach)
                 } else if (attach instanceof Item) {
                     // todo 触发道具效果
                     attach.use()
@@ -155,6 +157,41 @@ class GameController {
         // 将当前路上设置为玩家
         road = this.getFromMap(this.player.x, this.player.y)
         road.attach = this.player
+    }
+
+    battle(enemy) {
+        console.log('battle')
+        // 伤害计算
+        let damageToEnemy = Math.max(this.player.attack - enemy.defence, 1)
+        let damageToPlayer = Math.max(enemy.attack - this.player.defence, 1)
+
+        // 先计算玩家对敌人的伤害
+        enemy.hp = Math.max(0, enemy.hp - damageToEnemy)
+        console.log(`你对 ${enemy.name} 造成了 ${damageToEnemy} 点伤害`)
+        if (enemy.hp === 0) {
+            audioPlayer.playEffect('audio/explosion.mp3')
+            console.log(`${enemy.name} 死了`)
+            // 删除敌人
+            let obj = this.getFromMap(enemy.x, enemy.y)
+            obj.attack = null
+            scene.scene.remove(enemy.sprite)
+            // 移动玩家
+            this.move(enemy.x, enemy.y)
+        } else {
+            // 播放打击音效
+            audioPlayer.playEffect('audio/attack.mp3')
+            // 计算敌人对玩家伤害
+            this.player.hp = Math.max(0, this.player.hp - damageToPlayer)
+            console.log(`${enemy.name} 对你造成了 ${damageToPlayer} 点伤害`)
+            if (this.player.hp === 0) {
+                alert(`你被 ${enemy.name} 杀死了，游戏结束`)
+            }
+        }
+        console.log(`你现在的状态：    敌人状态：
+        hp: ${this.player.hp}   ${enemy.hp}
+        attack: ${this.player.attack}   ${enemy.attack}
+        defence: ${this.player.defence}    ${enemy.defence}
+        `)
     }
 }
 
